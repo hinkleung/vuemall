@@ -31,7 +31,14 @@ export default {
     // })
 
     //JSONP跨域解决(前端加插件、后端小改)
-    let url2 = 'https://www.imooc.com/search/hotwords'
+    // let url2 = '/search/hotwords'
+    // jsonp(url2,(err,res)=>{
+    //   let result = res;
+    //   this.data = result;
+    // })
+
+    //接口代理
+    let url2 = '/api/search/hotwords'
     jsonp(url2,(err,res)=>{
       let result = res;
       this.data = result;
