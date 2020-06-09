@@ -14,7 +14,7 @@
           <a href="javascript:;" v-if="username">我的订单</a>
           <a href="javascript:;" v-if="!username">注册</a>
           <a href="javascript:;" class="my-cart" @click="goToCart">
-            <span class="icon-cart"></span>购物车
+            <span class="icon-cart"></span>购物车({{cartCount}})
           </a>
         </div>
       </div>
@@ -125,8 +125,15 @@ export default {
   name: "nav-header",
   data(){
     return {
-      username:'11',
       phoneList:[]
+    }
+  },
+  computed:{
+    username(){
+      return this.$store.state.username;
+    },
+    cartCount(){
+      return this.$store.state.cartCount;
     }
   },
   filters:{
