@@ -121,51 +121,61 @@
   </div>
 </template>
 <script>
-export default {
-  name: "nav-header",
-  data(){
-    return {
-      phoneList:[]
-    }
-  },
-  computed:{
-    username(){
-      return this.$store.state.username;
+  import {mapState} from 'vuex'
+  export default{
+    name:'nav-header',
+    data(){
+      return {
+        phoneList:[]
+      }
     },
-    cartCount(){
-      return this.$store.state.cartCount;
-    }
-  },
-  filters:{
-    currency(val){
-      if(!val) return '0.00';
-      return '￥' + val.toFixed(2) +'元';
-    }
-  },
-  mounted(){
-    this.getProductList();
-  },
-  methods:{
-    login(){
-      this.$router.push('/login');
+    computed:{
+      /*username(){
+        return this.$store.state.username;
+      },
+      cartCount(){
+        return this.$store.state.cartCount;
+      }*/
+      ...mapState(['username','cartCount'])
     },
-    getProductList(){
-      this.axios.get('/products',{
-        params:{
-          categoryId:'100012'
-        }
-      }).then((res)=>{
-        if(res.list.length>=6){
-          this.phoneList = res.list.slice(0,6);
-        }
-      })
+    filters:{
+      currency(val){
+        if(!val)return '0.00';
+        return '￥' + val.toFixed(2) + '元';
+      }
     },
-    goToCart(){
-      this.$router.push('/cart');
+    mounted(){
+      this.getProductList();
+      let params = this.$route.params;
+      if(params && params.from == 'login'){
+        this.getCartCount();
+      }
+    },
+    methods:{
+      login(){
+        this.$router.push('/login');
+      },
+      getProductList(){
+        this.axios.get('/products',{
+          params:{
+            categoryId:'100012',
+            pageSize:6
+          }
+        }).then((res)=>{
+          this.phoneList = res.list;
+        })
+      },
+      getCartCount(){
+        this.axios.get('/carts/products/sum').then((res=0)=>{
+          this.$store.dispatch('saveCartCount',res);
+        })
+      },
+      goToCart(){
+        this.$router.push('/cart');
+      }
     }
   }
-};
-</script>
+</script>``
 <style lang="scss">
 @import "./../assets/scss/base.scss";
 @import "./../assets/scss/mixin.scss";
