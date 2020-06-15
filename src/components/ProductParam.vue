@@ -48,9 +48,10 @@ export default {
   background-color: $colorG;
   &.is_fixed {
     position: fixed;
-    top: 0px;
+    top: 0;
     width:100%;
     box-shadow: 0 5px 5px $colorE;
+    z-index:10;
   }
   .container {
     @include flex();
