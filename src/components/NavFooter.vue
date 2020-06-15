@@ -5,7 +5,7 @@
       <p>小米商城</p>
     </div>
     <div class="footer-link">
-      <a href="https://www.baidu.com" target="_blank">凉茶饭</a>
+      <a href="http://localhost:8080/#/index" target="_blank">凉茶饭</a>
       <span>|</span>
       <a href>VUE全家桶</a>
       <span>|</span>
