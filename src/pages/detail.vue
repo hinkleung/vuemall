@@ -285,7 +285,7 @@ export default {
           }
           .choose-color {
             h3 {
-              margin-top: 40px;
+              margin-top: 90px;
               font-size: 18px;
               line-height: 18px;
               color: $colorB;
