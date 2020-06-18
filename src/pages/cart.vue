@@ -91,6 +91,36 @@ export default {
         this.renderData(res);
       })
     },
+    updateCart(item,type){
+      let quantity = item.quantity,
+          selected = item.productSelected;
+      if(type == '-'){
+        if(quantity == 1){
+          alert('商品至少保留一件');
+          return;
+        }
+        --quantity;
+      }else if(type == '+'){
+        if(quantity >= item.productStock){
+          alert('商品不能大于库存数量');
+          return;
+        }
+        ++quantity;
+      }else{
+        selected = !item.productSelected;
+      }
+      this.axios.put(`/carts/${item.productId}`,{
+        quantity,
+        selected
+      }).then((res)=>{
+        this.renderData(res);
+      })
+    },
+    delProduct(item){
+      this.axios.delete(`/carts/${item.productId}`).then((res)=>{
+        this.renderData(res);
+      })
+    },
     toggleAll(){
       let url = this.allChecked?'/carts/unSelectAll':'/carts/selectAll';
       this.axios.put(url).then((res)=>{
