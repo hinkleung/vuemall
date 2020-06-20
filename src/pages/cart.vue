@@ -96,13 +96,13 @@ export default {
           selected = item.productSelected;
       if(type == '-'){
         if(quantity == 1){
-          alert('商品至少保留一件');
+          this.$message.warning('商品至少保留一件');
           return;
         }
         --quantity;
       }else if(type == '+'){
         if(quantity >= item.productStock){
-          alert('商品不能大于库存数量');
+          this.$message.warning('商品不能大于库存数量');
           return;
         }
         ++quantity;
@@ -118,6 +118,7 @@ export default {
     },
     delProduct(item){
       this.axios.delete(`/carts/${item.productId}`).then((res)=>{
+        this.$message.success('删除成功');
         this.renderData(res);
       })
     },
@@ -136,7 +137,7 @@ export default {
     order(){
       let isCheck = this.list.every(item=>!item.productSelected);
       if(isCheck){
-        alert('请选择一件商品');
+        this.$message.warning('请选择一件商品');
       }else{
         this.$router.push('/order/confirm');
       }
