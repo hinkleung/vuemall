@@ -23,7 +23,7 @@
           <div class="item-detail" v-if="showDetail">
             <div class="item">
               <div class="detail-title">订单号：</div>
-              <div class="detail-info theme-color">{{orderId}}</div>
+              <div class="detail-info theme-color">{{orderNo}}</div>
             </div>
             <div class="item">
               <div class="detail-title">收货信息：</div>
@@ -63,7 +63,33 @@
 
 export default{
   name:'order-pay',
-
+  data(){
+    return {
+      orderNo:this.$route.query.orderNo,
+      addressInfo:'',//收货人地址
+      orderDetail:[],//订单详情，包含商品列表
+      showDetail:false,//是否显示订单详情
+      payType:'',//支付类型 1支付宝 2微信
+    }
+  },
+  mounted(){
+    this.getOrderDetail();
+  },
+  methods:{
+    getOrderDetail(){
+      this.axios.get(`/orders/${this.orderNo}`).then((res)=>{
+        let item = res.shippingVo;
+        this.addressInfo = `${item.receiverName} ${item.receiverMobile} ${item.receiverProvince} ${item.receiverCity} ${item.receiverDistrict} ${item.receiverAddress}`;
+        this.orderDetail = res.orderItemVoList;
+      })
+    },
+    paySubmit(payType){
+      if(payType == 1){
+        window.open('/#/order/alipay?orderId='+this.orderNo,'_blank');
+      }
+    },
+  }
+  
 }
 </script>
 <style lang="scss">
