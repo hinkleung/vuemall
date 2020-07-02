@@ -73,6 +73,7 @@
 </template>
 <script>
 import QRCode from 'qrcode'
+import OrderHeader from './../components/OrderHeader'
 import ScanPayCode from './../components/ScanPayCode'
 import Modal from './../components/Modal'
 export default{
@@ -92,6 +93,7 @@ export default{
     }
   },
   components:{
+    OrderHeader,
     ScanPayCode,
     Modal
   },
