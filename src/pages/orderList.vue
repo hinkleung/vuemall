@@ -46,29 +46,29 @@
               </div>
             </div>
           </div>
-          <!-- <img src="/imgs/loading-svg/loading-spinning-bubbles.svg" alt="" v-show="loading"> -->
+          <el-pagination
+            v-if="true"
+            class="pagination"
+            background
+            layout="prev, pager, next"
+            :pageSize="pageSize"
+            :total="total"
+            @current-change="handleChange"
+          ></el-pagination>
+          <div class="load-more" v-if="false">
+            <el-button type="primary" :loading="loading" @click="loadMore">加载更多</el-button>
+          </div>
+          <div
+            class="scroll-more"
+            v-infinite-scroll="scrollMore"
+            infinite-scroll-disabled="true"
+            infinite-scroll-distance="410"
+            v-if="false"
+          >
+            <img src="/imgs/loading-svg/loading-spinning-bubbles.svg" alt v-show="loading" />
+          </div>
+          <no-data v-if="!loading && list.length==0"></no-data>
         </div>
-        <el-pagination
-          v-if="false"
-          class="pagination"
-          background
-          layout="prev,pager,next"
-          :pageSize="pageSize"
-          :total="total"
-          @current-change="handleChange"
-        ></el-pagination>
-        <div class="load-more" v-show="showNextPage">
-          <el-button type="primary" :loading="loading" @click="loadMore">加载更多</el-button>
-        </div>
-        <div
-          class="scroll-more"
-          v-infinite-scroll="scrollMore"
-          infinite-scroll-disabled="busy"
-          infinite-scroll-distance="410"
-        >
-          <img src="/imgs/loading-svg/loading-spinning-bubbles.svg" alt v-show="loading"/>
-        </div>
-        <NoData v-if="!loading && list.length==0"></NoData>
       </div>
     </div>
   </div>
@@ -98,8 +98,8 @@ export default {
       pageSize: 10,
       pageNum: 1,
       total: 0,
-      busy: false,
-      showNextPage:true,
+      showNextPage: true, //加载更多：是否显示按钮
+      busy: false //滚动加载，是否触发
     };
   },
   mounted() {
@@ -112,7 +112,7 @@ export default {
       this.axios
         .get("/orders", {
           params: {
-            pageSize: this.pageSize,
+            pageSize: 10,
             pageNum: this.pageNum
           }
         })
@@ -120,14 +120,22 @@ export default {
           this.loading = false;
           this.list = this.list.concat(res.list);
           this.total = res.total;
-          this.busy = false; 
-          this.showNextPage = res.hashNextPage;
+          this.showNextPage = res.hasNextPage;
+          this.busy = false;
         })
         .catch(() => {
           this.loading = false;
         });
     },
     goPay(orderNo) {
+      // 三种路由跳转方式
+      // this.$router.push('/order/pay')
+      /*this.$router.push({
+          name:'order-pay',
+          query:{
+            orderNo
+          }
+        })*/
       this.$router.push({
         path: "/order/pay",
         query: {
@@ -135,14 +143,17 @@ export default {
         }
       });
     },
+    // 第一种方法：分页器
     handleChange(pageNum) {
       this.pageNum = pageNum;
       this.getOrderList();
     },
+    // 第二种方法：加载更多按钮
     loadMore() {
       this.pageNum++;
       this.getOrderList();
     },
+    // 第三种方法：滚动加载，通过npm插件实现
     scrollMore() {
       this.busy = true;
       setTimeout(() => {
@@ -150,12 +161,13 @@ export default {
         this.getList();
       }, 500);
     },
+    // 专门给scrollMore使用
     getList() {
       this.loading = true;
       this.axios
         .get("/orders", {
           params: {
-            pageSize: this.pageSize,
+            pageSize: 10,
             pageNum: this.pageNum
           }
         })
@@ -244,9 +256,7 @@ export default {
         background-color: #ff6600;
         border-color: #ff6600;
       }
-      .load-more {
-        text-align: center;
-      }
+      .load-more,
       .scroll-more {
         text-align: center;
       }
