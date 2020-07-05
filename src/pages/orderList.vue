@@ -48,6 +48,14 @@
           </div>
           <!-- <img src="/imgs/loading-svg/loading-spinning-bubbles.svg" alt="" v-show="loading"> -->
         </div>
+        <el-pagination
+          class="pagination"
+          background
+          layout="prev,pager,next"
+          :pageSize="pageSize"
+          :total="total"
+          @current-change="handleChange"
+        ></el-pagination>
         <NoData v-if="!loading && list.length==0"></NoData>
       </div>
     </div>
@@ -57,17 +65,22 @@
 import OrderHeader from "./../components/OrderHeader";
 import Loading from "./../components/Loading";
 import NoData from "./../components/NoData";
+import { Pagination } from "element-ui";
 export default {
   name: "order-list",
   components: {
     OrderHeader,
     Loading,
-    NoData
+    NoData,
+    [Pagination.name]: Pagination
   },
   data() {
     return {
       loading: true,
-      list: []
+      list: [],
+      pageSize: 10,
+      pageNum: 1,
+      total: 0
     };
   },
   mounted() {
@@ -76,10 +89,15 @@ export default {
   methods: {
     getOrderList() {
       this.axios
-        .get("/orders")
+        .get("/orders", {
+          params: {
+            pageNum: this.pageNum
+          }
+        })
         .then(res => {
           this.loading = false;
-          this.list = []||res.list;
+          this.list = res.list;
+          this.total = res.total;
         })
         .catch(() => {
           this.loading = false;
@@ -92,6 +110,10 @@ export default {
           orderNo
         }
       });
+    },
+    handleChange(pageNum) {
+      this.pageNum = pageNum;
+      this.getOrderList();
     }
   }
 };
