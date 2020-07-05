@@ -57,8 +57,16 @@
           :total="total"
           @current-change="handleChange"
         ></el-pagination>
-        <div class="load-more">
+        <div class="load-more" v-show="showNextPage">
           <el-button type="primary" :loading="loading" @click="loadMore">加载更多</el-button>
+        </div>
+        <div
+          class="scroll-more"
+          v-infinite-scroll="scrollMore"
+          infinite-scroll-disabled="busy"
+          infinite-scroll-distance="410"
+        >
+          <img src="/imgs/loading-svg/loading-spinning-bubbles.svg" alt v-show="loading"/>
         </div>
         <NoData v-if="!loading && list.length==0"></NoData>
       </div>
@@ -70,6 +78,7 @@ import OrderHeader from "./../components/OrderHeader";
 import Loading from "./../components/Loading";
 import NoData from "./../components/NoData";
 import { Pagination, Button } from "element-ui";
+import infiniteScroll from "vue-infinite-scroll";
 export default {
   name: "order-list",
   components: {
@@ -79,13 +88,18 @@ export default {
     [Pagination.name]: Pagination,
     [Button.name]: Button
   },
+  directives: {
+    infiniteScroll
+  },
   data() {
     return {
       loading: false,
       list: [],
       pageSize: 10,
       pageNum: 1,
-      total: 0
+      total: 0,
+      busy: false,
+      showNextPage:true,
     };
   },
   mounted() {
@@ -94,6 +108,7 @@ export default {
   methods: {
     getOrderList() {
       this.loading = true;
+      this.busy = true;
       this.axios
         .get("/orders", {
           params: {
@@ -105,6 +120,8 @@ export default {
           this.loading = false;
           this.list = this.list.concat(res.list);
           this.total = res.total;
+          this.busy = false; 
+          this.showNextPage = res.hashNextPage;
         })
         .catch(() => {
           this.loading = false;
@@ -122,9 +139,35 @@ export default {
       this.pageNum = pageNum;
       this.getOrderList();
     },
-    loadMore(){
+    loadMore() {
       this.pageNum++;
       this.getOrderList();
+    },
+    scrollMore() {
+      this.busy = true;
+      setTimeout(() => {
+        this.pageNum++;
+        this.getList();
+      }, 500);
+    },
+    getList() {
+      this.loading = true;
+      this.axios
+        .get("/orders", {
+          params: {
+            pageSize: this.pageSize,
+            pageNum: this.pageNum
+          }
+        })
+        .then(res => {
+          this.list = this.list.concat(res.list);
+          this.loading = false;
+          if (res.hasNextPage) {
+            this.busy = false;
+          } else {
+            this.busy = true;
+          }
+        });
     }
   }
 };
@@ -201,7 +244,7 @@ export default {
         background-color: #ff6600;
         border-color: #ff6600;
       }
-      .load-more{
+      .load-more {
         text-align: center;
       }
       .scroll-more {
