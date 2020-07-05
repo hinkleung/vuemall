@@ -49,6 +49,7 @@
           <!-- <img src="/imgs/loading-svg/loading-spinning-bubbles.svg" alt="" v-show="loading"> -->
         </div>
         <el-pagination
+          v-if="false"
           class="pagination"
           background
           layout="prev,pager,next"
@@ -56,6 +57,9 @@
           :total="total"
           @current-change="handleChange"
         ></el-pagination>
+        <div class="load-more">
+          <el-button type="primary" :loading="loading" @click="loadMore">加载更多</el-button>
+        </div>
         <NoData v-if="!loading && list.length==0"></NoData>
       </div>
     </div>
@@ -65,18 +69,19 @@
 import OrderHeader from "./../components/OrderHeader";
 import Loading from "./../components/Loading";
 import NoData from "./../components/NoData";
-import { Pagination } from "element-ui";
+import { Pagination, Button } from "element-ui";
 export default {
   name: "order-list",
   components: {
     OrderHeader,
     Loading,
     NoData,
-    [Pagination.name]: Pagination
+    [Pagination.name]: Pagination,
+    [Button.name]: Button
   },
   data() {
     return {
-      loading: true,
+      loading: false,
       list: [],
       pageSize: 10,
       pageNum: 1,
@@ -88,15 +93,17 @@ export default {
   },
   methods: {
     getOrderList() {
+      this.loading = true;
       this.axios
         .get("/orders", {
           params: {
+            pageSize: this.pageSize,
             pageNum: this.pageNum
           }
         })
         .then(res => {
           this.loading = false;
-          this.list = res.list;
+          this.list = this.list.concat(res.list);
           this.total = res.total;
         })
         .catch(() => {
@@ -113,6 +120,10 @@ export default {
     },
     handleChange(pageNum) {
       this.pageNum = pageNum;
+      this.getOrderList();
+    },
+    loadMore(){
+      this.pageNum++;
       this.getOrderList();
     }
   }
@@ -190,7 +201,9 @@ export default {
         background-color: #ff6600;
         border-color: #ff6600;
       }
-      .load-more,
+      .load-more{
+        text-align: center;
+      }
       .scroll-more {
         text-align: center;
       }
