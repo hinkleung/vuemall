@@ -1,3 +1,5 @@
+const { config } = require("vue/types/umd");
+
 module.exports = {
   devServer: {
     host: 'localhost',
@@ -12,5 +14,8 @@ module.exports = {
       }
     }
   },
-  productionSourceMap:false
+  productionSourceMap: false,
+  chainWebpack: (config) => {
+    config.plugins.delete('prefetch');
+  }
 }
